@@ -58,7 +58,8 @@ function Emphasised({ text }: { text: string }) {
  *
  * C1-ST-02: nothing is persisted. There is no localStorage, no sessionStorage
  * and no URL state, so there is nothing that could survive a reload
- * invisibly. That is the strongest form of the requirement rather than a
+ * invisibly. (The suite footer, not this tool, keeps the visitor's answer to
+ * its privacy banner in one localStorage entry; it never holds an input.) That is the strongest form of the requirement rather than a
  * shortcut past it: the alternative, persisting and marking it, adds a thing
  * to get wrong for a convenience nobody asked for.
  *
