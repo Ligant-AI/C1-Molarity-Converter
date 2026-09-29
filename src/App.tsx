@@ -21,7 +21,6 @@ import { UNDETECTABLE_FAILURES } from './lib/flags'
 import {
   CANNOT_DETECT_INTRO,
   HOW_TO_USE,
-  STANDFIRST,
   TOOLTIPS,
   WHY_THIS_TOOL_EXISTS,
   WORKED_EXAMPLES,
@@ -29,7 +28,8 @@ import {
 } from './lib/copy'
 import { confirmField, retainedOnDirectionChange, toRetainedFields, type RetainableField } from './lib/retention'
 import { APP_VERSION, TOOL_NAME } from './lib/site'
-import { LigantMark, SiteFooter, SiteHeader } from './Brand'
+import { LigantMark, SuiteFooter, SuiteHeader } from '@ligant/bench-chrome/react'
+import { FOOTER, HEADER } from './lib/chrome'
 import { InfoTip } from './InfoTip'
 import { formatSigFigs } from './lib/format'
 
@@ -242,10 +242,7 @@ export function App() {
     <>
       <a className="skip" href="#result">Skip to result</a>
       <div className="wrap">
-        <SiteHeader
-          tool={TOOL_NAME}
-          description={STANDFIRST.map((p) => <p key={p}>{p}</p>)}
-        />
+        <SuiteHeader {...HEADER} />
 
         {/*
           The suite's layout: numbered declaration panels on the left, the
@@ -743,7 +740,7 @@ export function App() {
           </section>
         )}
 
-        <SiteFooter />
+        <SuiteFooter {...FOOTER} />
 
         <div className="colophon">
           <LigantMark size={16} />

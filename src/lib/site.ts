@@ -25,53 +25,9 @@ export const TOOL_ID = 'C1'
 export const URS_VERSION = '0.5'
 export const REPO_URL = 'https://github.com/Ligant-AI/C1-Molarity-Converter'
 
-/** The parent site, one level up from the suite. Not `SITE_URL`: that is the
- *  Bench Tools suite's own address, this is Ligant's. */
-export const LIGANT_URL = 'https://ligant.ai/'
 
-/** The footer's Privacy Policy link, the one standard statement across the suite. Exact value
- *  only: the privacy check allows this URL and nothing wider on ligant.ai. */
-export const PRIVACY_URL = 'https://ligant.ai/privacy'
-
-export interface Tool {
-  id: string
-  /** Label in the masthead's tool navigation. */
-  name: string
-  /** Path from the site root, always with a trailing slash. */
-  path: string
-}
-
-/**
- * The suite, as the masthead's tool navigation presents it.
- *
- * The same five entries, in the same order and with the same labels, as every
- * sibling's list (the Reconstitution tool's, as deployed on 29 September 2026),
- * so the navigation reads identically whichever tool the reader is on. A change
- * here belongs in theirs too. Add a tool only once it is live at `path`:
- * a pill that 404s is worse than a tool the navigation does not mention yet.
- *
- * The entry whose `path` is this tool's `TOOL_PATH` renders as the current
- * page rather than as a link.
- */
-export const TOOLS: readonly Tool[] = [
-  { id: 'antibody-titration', name: 'Antibody titration', path: '/antibody-titration-planner/' },
-  { id: 'molarity', name: 'Molarity', path: '/molarity-converter/' },
-  { id: 'antigen-density', name: 'Antigen density', path: '/antigen-density-calculator/' },
-  { id: 'dilution', name: 'Dilution', path: '/dilution-planner/' },
-  { id: 'reconstitution', name: 'Reconstitution', path: '/reconstitution/' },
-]
-
-/**
- * Absolute URL for a path within the suite.
- *
- * ABSOLUTE, NOT ROOT-RELATIVE. This page is reachable at the suite's address
- * and at its own `*.pages.dev` origin, and on the latter `/antibody-titration-
- * planner/` does not exist: it is another project. Pinning every suite link to
- * `SITE_URL` makes them work from either.
- */
-export function absoluteUrl(path: string): string {
-  return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
-}
+/* The parent site, the Privacy Policy and the list of tools are the suite's,
+ * in the shared header and footer (@ligant/bench-chrome). */
 
 /**
  * The released version, cited in the footer and in CITATION.cff.
