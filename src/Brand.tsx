@@ -7,7 +7,7 @@
  * masthead is how the suite ends up with two identities.
  *
  * Read from the Antigen Density Calculator as deployed on 4 September 2026:
- * the mark geometry, the lockup and the footer's three paragraphs are the
+ * the mark geometry, the lockup and the footer's paragraphs are the
  * reference's, not reinvented here. The masthead has since been brought into
  * line with the Antibody Titration Planner's; see `SiteHeader`.
  */
@@ -18,6 +18,7 @@ import {
   CITATION_DOI,
   DEPLOYED_URL,
   LIGANT_URL,
+  PRIVACY_URL,
   RELEASE_YEAR,
   REPO_URL,
   TOOLS,
@@ -126,36 +127,6 @@ export function SiteHeader({ tool, description }: { tool: string; description: R
 }
 
 /**
- * What a tool is entitled to say about data leaving the browser.
- *
- * THIS IS THE RESOLUTION OF THE CLAIM-GATE CONFLICT, and it belongs here
- * rather than in C1.
- *
- * The reference footer states "no data is transmitted" unconditionally. That is
- * an environment claim about the SERVED page, and the only thing that can
- * establish it is a real browser against the deployed address, C1's acceptance
- * test 14. A shared footer that hard-codes the strong sentence is a mechanism
- * for reintroducing exactly the failure that test exists to catch: the beacon
- * incident was a host inserting a request into a response that every
- * build-level check called clean.
- *
- * So the claim is not a string in this component. It is a REQUIRED parameter
- * with two variants, and there is no default. A tool cannot render the footer
- * without saying which evidence state it is in, and a tool with no evidence
- * cannot accidentally inherit the sentence belonging to one that has it.
- *
- * C1 does not opt out of the shared footer; the shared footer stopped being
- * able to make an unearned claim. The reference tool should adopt this
- * component and supply its own evidence state, its footer is currently
- * ungated, which is the same finding pointing the other way.
- */
-export type TransmissionEvidence =
-  /** Verified in a real browser AT THIS ADDRESS. C1: acceptance test 14 passed. */
-  | { verifiedAtThisAddress: true }
-  /** Not verified at this address. `outstanding` says what is missing, on the page. */
-  | { verifiedAtThisAddress: false; outstanding: string }
-
-/**
  * The citation, in three pieces, so what is shown and what is copied cannot
  * differ. Matches the reference tool's SOFTWARE citation exactly; there is no
  * paper behind this tool, so there is no preferred-citation half to add.
@@ -202,12 +173,14 @@ function CitationRow({ lead, title, tail }: { lead: string; title: string; tail:
   )
 }
 
+/**
+ * The shared footer. Its privacy statement is the suite's standard one, word
+ * for word the same in every Bench Tool, including its disclosure of Cloudflare
+ * Web Analytics.
+ */
 export function SiteFooter({
-  transmission,
   children,
 }: {
-  /** Required. There is deliberately no default, see TransmissionEvidence. */
-  transmission: TransmissionEvidence
   /** Tool-specific lines, after the shared prose. */
   children?: ReactNode
 }) {
@@ -216,38 +189,13 @@ export function SiteFooter({
     <footer className="site-footer">
       <div className="footer-grid">
         <div className="footer-prose">
-          {/*
-            The privacy statement. "never sent anywhere" is the one clause here
-            that is an environment claim about THIS served page rather than
-            about Ligant's data handling, so it alone carries the
-            TransmissionEvidence gate; the sentences around it hold regardless
-            of where they're read from and are not conditional on anything.
-          */}
           <p>
-            Your data stays in your browser. Everything you enter into this tool is calculated
-            on your own device and never sent anywhere
-            {transmission.verifiedAtThisAddress ? (
-              <>, verified in a real browser at this address.</>
-            ) : (
-              <>
-                {' '}in this build, verified statically and in a real browser against the
-                build.{' '}
-                <strong>Not yet verified at this address:</strong> {transmission.outstanding}
-              </>
-            )}{' '}
-            We do not see it, store it, or have any way to retrieve it. Closing the page ends
-            it.
-          </p>
-          <p>
-            There is no account and no tracking of you. No login, no sign up, no cookies for
-            advertising, no analytics scripts, and no third-party code of any kind runs on
-            this page.
-          </p>
-          <p>
-            We do count visits. Our hosting provider records basic traffic: which pages get
-            opened, how often, and roughly where in the world from. Because we collect
-            nothing about who you are, this is the only signal we have about whether these
-            tools are useful and which one to build next.
+            Ligant Bench Tools are free and open source under Apache 2.0, for research and educational use.{' '}
+            <strong>Privacy.</strong> Everything you enter into this tool stays on your computer. Calculations run entirely in your browser, and your inputs are never transmitted, stored, or logged. We use Cloudflare Web Analytics to count visits and measure how quickly this page loads, so we can see which tools are used and improve them. It sets no cookie, does not identify you, and never reads what you type.{' '}
+            <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+              <span className="visually-hidden"> (opens in a new tab)</span>
+            </a>
           </p>
           <p>
             Every figure on this page comes from code you can read, download or run yourself, at{' '}
@@ -263,7 +211,6 @@ export function SiteFooter({
             validation. If your lab needs that, please email us{' '}
             <a href="mailto:hello@ligant.ai">hello@ligant.ai</a>.
           </p>
-          <p>Ligant Bench Tools are free and open source, under the licence below.</p>
           {children}
         </div>
 

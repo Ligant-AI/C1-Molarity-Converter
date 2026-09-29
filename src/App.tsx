@@ -28,7 +28,7 @@ import {
   WORKED_EXAMPLES_INTRO,
 } from './lib/copy'
 import { confirmField, retainedOnDirectionChange, toRetainedFields, type RetainableField } from './lib/retention'
-import { APP_VERSION, NETWORK_CLAIM_VERIFIED, TOOL_NAME } from './lib/site'
+import { APP_VERSION, TOOL_NAME } from './lib/site'
 import { LigantMark, SiteFooter, SiteHeader } from './Brand'
 import { InfoTip } from './InfoTip'
 import { formatSigFigs } from './lib/format'
@@ -743,31 +743,7 @@ export function App() {
           </section>
         )}
 
-        {/*
-          C1-NF-01 is an environment claim about the SERVED page, and acceptance
-          test 14 establishes it. The shared footer will not render a
-          transmission claim without being told which evidence state the tool is
-          in: see TransmissionEvidence in Brand.tsx. C1 supplies its own from
-          NETWORK_CLAIM_VERIFIED, which check-network.mjs refuses to let anyone
-          set on the strength of a local run.
-        */}
-        {/*
-          No children here: the privacy statement in SiteFooter's own prose
-          now covers "no account" and "nothing persists" directly, so a
-          tool-specific line repeating it would just be the same sentence
-          twice in the same footer.
-        */}
-        <SiteFooter
-          transmission={
-            NETWORK_CLAIM_VERIFIED
-              ? { verifiedAtThisAddress: true }
-              : {
-                  verifiedAtThisAddress: false,
-                  outstanding:
-                    'acceptance test 14 is unrun, and only it can rule out a request inserted after the build.',
-                }
-          }
-        />
+        <SiteFooter />
 
         <div className="colophon">
           <LigantMark size={16} />
