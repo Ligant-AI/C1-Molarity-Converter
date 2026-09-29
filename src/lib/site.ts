@@ -29,6 +29,10 @@ export const REPO_URL = 'https://github.com/Ligant-AI/C1-Molarity-Converter'
  *  Bench Tools suite's own address, this is Ligant's. */
 export const LIGANT_URL = 'https://ligant.ai/'
 
+/** The footer's Privacy Policy link, the one standard statement across the suite. Exact value
+ *  only: the privacy check allows this URL and nothing wider on ligant.ai. */
+export const PRIVACY_URL = 'https://ligant.ai/privacy'
+
 export interface Tool {
   id: string
   /** Label in the masthead's tool navigation. */
