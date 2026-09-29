@@ -41,13 +41,14 @@ function Emphasised({ text }: { text: string }) {
 /**
  * The whole tool.
  *
- * C1-NF-03 requires the inputs and the result to fit one screen without
- * scrolling, so the converter holds the inputs and the result and nothing
- * else. What teaches the tool sits below it, where there is room: how to use
- * it, worked examples, why it exists, and the §9 list of what it cannot
- * detect (C1-FC-01), which is rendered from `UNDETECTABLE_FAILURES` rather than
+ * The suite's layout, shared with the Dilution Planner and Reconstitution:
+ * numbered declaration panels on the left and the result on the right, so
+ * C1-NF-03's inputs and result sit side by side on one screen. What teaches
+ * the tool follows the declarations in the left column: how to use it, worked
+ * examples, why it exists, and the §9 list of what it cannot detect
+ * (C1-FC-01), which is rendered from `UNDETECTABLE_FAILURES` rather than
  * edited as prose. Each control's explanation is a tooltip, not a hint line,
- * so reading it does not make the converter taller.
+ * so reading it does not make the panels taller.
  *
  * THE §11 CONSTANTS REGISTER IS NOT ON THE PAGE. Removed by the product
  * owner's ruling of 11 September 2026, as a scope decision. The rows stay in
@@ -220,6 +221,20 @@ export function App() {
   }, [direction, entered, enteredUnit, mw, mwUnit, provenance, massBasis, units, retained])
 
   const result = outcome && outcome.ok ? outcome : null
+
+  /**
+   * What the empty result panel lists, in the order the form asks for it. The
+   * same six conditions that gate `outcome` above, so the list cannot name a
+   * declaration the computation does not wait for, or omit one it does.
+   */
+  const missing = [
+    entered.trim() === '' && `enter the ${direction === 'mass-to-molar' ? 'mass' : 'molar'} concentration`,
+    enteredUnit === '' && 'select the unit of the concentration',
+    mw.trim() === '' && 'enter the molecular weight',
+    mwUnit === '' && 'select the unit of the molecular weight',
+    provenance === '' && 'declare the source of that weight; "not recorded" is an accepted answer',
+    massBasis === '' && 'declare what the weight is the mass of; "not recorded" is an accepted answer',
+  ].filter((m): m is string => typeof m === 'string')
   const rejections = outcome && !outcome.ok ? outcome.rejections : null
   const enteredIsMass = direction === 'mass-to-molar'
 
@@ -232,419 +247,501 @@ export function App() {
           description={STANDFIRST.map((p) => <p key={p}>{p}</p>)}
         />
 
-        <main className="converter">
-          <section className="panel" aria-labelledby="inputs-h">
-            <h2 id="inputs-h">Inputs</h2>
-
+        {/*
+          The suite's layout: numbered declaration panels on the left, the
+          result on the right, and what teaches the tool under the declarations
+          in the same column, as in the Dilution Planner and Reconstitution.
+          Under 1060px it is one column: declarations, result, then the rest.
+        */}
+        <main className="converter layout">
+          <div className="stack">
             {/* C1-CV-02. Selected before data entry; not a mode. */}
-            <fieldset className="field">
-              <legend>
-                Convert
-                <InfoTip topic="the conversion direction" paragraphs={TOOLTIPS.direction} />
-              </legend>
-              <div className="directions" role="group" aria-label="Conversion direction">
-                <button
-                  type="button"
-                  aria-pressed={direction === 'mass-to-molar'}
-                  onClick={() => changeDirection('mass-to-molar')}
-                >
-                  mass → molar
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={direction === 'molar-to-mass'}
-                  onClick={() => changeDirection('molar-to-mass')}
-                >
-                  molar → mass
-                </button>
+            <section className="panel" aria-labelledby="direction-h">
+              <div className="panel-head">
+                <div className="titles">
+                  <span className="step" aria-hidden="true">1</span>
+                  <h2 id="direction-h">Direction</h2>
+                </div>
               </div>
-            </fieldset>
+              <div className="panel-body">
+                <fieldset className="field">
+                  <legend>
+                    What do you know, and what do you want computed?
+                    <InfoTip topic="the conversion direction" paragraphs={TOOLTIPS.direction} />
+                  </legend>
+                  <div className="radios stacked">
+                    <label>
+                      <input
+                        type="radio"
+                        name="direction"
+                        checked={direction === 'mass-to-molar'}
+                        onChange={() => changeDirection('mass-to-molar')}
+                      />
+                      <span>
+                        <strong>mass → molar</strong>: enter a mass concentration; the molar concentration is computed
+                      </span>
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="direction"
+                        checked={direction === 'molar-to-mass'}
+                        onChange={() => changeDirection('molar-to-mass')}
+                      />
+                      <span>
+                        <strong>molar → mass</strong>: enter a molar concentration; the mass concentration is computed
+                      </span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <div className="field">
+                  <div className="label-row">
+                    <label htmlFor="outunit">Report the result in</label>
+                    <InfoTip topic="the result unit" paragraphs={TOOLTIPS.resultUnit} />
+                  </div>
+                  {enteredIsMass ? (
+                    <select id="outunit" value={outMolarUnit} onChange={(e) => setOutMolarUnit(e.target.value as MolarUnit)}>
+                      {MOLAR_UNITS.map((u) => (
+                        <option key={u} value={u}>{UNIT_LABEL[u]}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <select id="outunit" value={outMassUnit} onChange={(e) => setOutMassUnit(e.target.value as MassUnit)}>
+                      {MASS_UNITS.map((u) => (
+                        <option key={u} value={u}>{UNIT_LABEL[u]}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
+            </section>
 
             {/* C1-UN-01. The unit is chosen, not supplied. */}
-            <div className="field">
-              {/*
-                The tooltip sits beside the label, not inside it: a button
-                inside a <label> is interactive content inside another control's
-                label, and a click on it is not reliably the button's.
-              */}
-              <div className="label-row">
-                <label htmlFor="entered">
-                  {enteredIsMass ? 'Mass concentration' : 'Molar concentration'}
-                </label>
-                <InfoTip
-                  topic={enteredIsMass ? 'the mass concentration' : 'the molar concentration'}
-                  paragraphs={TOOLTIPS.concentration}
-                />
+            <section className="panel" aria-labelledby="conc-h">
+              <div className="panel-head">
+                <div className="titles">
+                  <span className="step" aria-hidden="true">2</span>
+                  <h2 id="conc-h">Concentration</h2>
+                </div>
               </div>
-              <div className="row">
-                <input
-                  id="entered"
-                  type="text"
-                  inputMode="decimal"
-                  value={entered}
-                  autoComplete="off"
-                  className={rejections?.some((r) => r.code === 'C1-HI-02') ? 'bad' : undefined}
-                  onChange={(e) => {
-                    setEntered(e.target.value)
-                    setCopied(null)
-                  }}
-                />
-                <select
-                  id="enteredunit"
-                  aria-label={enteredIsMass ? 'Mass concentration unit' : 'Molar concentration unit'}
-                  value={enteredUnit}
-                  onChange={(e) => {
-                    setEnteredUnit(e.target.value as MassUnit | MolarUnit)
-                    setCopied(null)
-                  }}
-                >
-                  <option value="" disabled>(select a unit)</option>
-                  {(enteredIsMass ? MASS_UNITS : MOLAR_UNITS).map((u) => (
-                    <option key={u} value={u}>{UNIT_LABEL[u]}</option>
-                  ))}
-                </select>
-                <InfoTip
-                  topic={enteredIsMass ? 'the mass concentration unit' : 'the molar concentration unit'}
-                  paragraphs={TOOLTIPS.concentrationUnit}
-                  align="end"
-                />
-              </div>
-            </div>
-
-            {/* C1-MW-01/02/03. Required, never inferred, unit always explicit. */}
-            <div className="field">
-              <div className="label-row">
-                <label htmlFor="mw">
-                  Molecular weight
-                  {retained.has('mw') && <span className="retained">Retained, not re-confirmed</span>}
-                </label>
-                <InfoTip topic="the molecular weight" paragraphs={TOOLTIPS.mw} />
-              </div>
-              <div className="row">
-                <input
-                  id="mw"
-                  type="text"
-                  inputMode="decimal"
-                  value={mw}
-                  autoComplete="off"
-                  className={rejections?.some((r) => r.code === 'C1-HI-01') ? 'bad' : undefined}
-                  onChange={(e) => {
-                    setMw(e.target.value)
-                    confirm('mw')
-                    setCopied(null)
-                  }}
-                />
-                <select
-                  id="mwunit"
-                  aria-label="Molecular weight unit"
-                  value={mwUnit}
-                  onChange={(e) => {
-                    setMwUnit(e.target.value as MwUnit)
-                    confirm('mw')
-                    setCopied(null)
-                  }}
-                >
-                  <option value="" disabled>(select a unit)</option>
-                  {MW_UNITS.map((u) => (
-                    <option key={u} value={u}>{UNIT_LABEL[u]}</option>
-                  ))}
-                </select>
-                <InfoTip topic="the molecular weight unit" paragraphs={TOOLTIPS.mwUnit} align="end" />
-              </div>
-            </div>
-
-            {/* C1-MW-04/05. "Not recorded" is a value, not a blank. */}
-            <div className="field">
-              <div className="label-row">
-                <label htmlFor="prov">
-                  Source of that weight
-                  {retained.has('provenance') && <span className="retained">Retained, not re-confirmed</span>}
-                </label>
-                <InfoTip topic="the source of the weight" paragraphs={TOOLTIPS.provenance} />
-              </div>
-              <select
-                id="prov"
-                value={provenance}
-                onChange={(e) => {
-                  setProvenance(e.target.value as MwProvenance)
-                  confirm('provenance')
-                  setCopied(null)
-                }}
-              >
-                <option value="" disabled>(select a source)</option>
-                {MW_PROVENANCE.map((p) => (
-                  <option key={p} value={p}>{MW_PROVENANCE_LABEL[p]}</option>
-                ))}
-              </select>
-            </div>
-
-            {/*
-              C1-MW-07/08. Single-select, and radios rather than a dropdown.
-
-              The options are not strictly exclusive in the abstract, a
-              PE-conjugated scFv is both single-chain and conjugated, and §3.3
-              resolves that by carrying the precedence rule inside the conjugate
-              option's own label. A <select> truncates its options to the width
-              of the control, which hides exactly the clause the rule depends on,
-              and the URS is explicit that without it two people in the same lab
-              answer differently for the same reagent. Radios show every label in
-              full.
-            */}
-            <fieldset className="field">
-              <legend>
-                The stated weight is the mass of
-                {retained.has('massBasis') && <span className="retained">Retained, not re-confirmed</span>}
-                <InfoTip topic="what the weight is the mass of" paragraphs={TOOLTIPS.massBasis} />
-              </legend>
-              <div className="basis-options">
-                {MASS_BASIS.map((b) => (
-                  <label key={b}>
+              <div className="panel-body">
+                <div className="field-row">
+                  <div className="field">
+                    {/*
+                      The tooltip sits beside the label, not inside it: a button
+                      inside a <label> is interactive content inside another
+                      control's label, and a click on it is not reliably the
+                      button's.
+                    */}
+                    <div className="label-row">
+                      <label htmlFor="entered">
+                        {enteredIsMass ? 'Mass concentration' : 'Molar concentration'}
+                      </label>
+                      <InfoTip
+                        topic={enteredIsMass ? 'the mass concentration' : 'the molar concentration'}
+                        paragraphs={TOOLTIPS.concentration}
+                      />
+                    </div>
                     <input
-                      type="radio"
-                      name="massBasis"
-                      value={b}
-                      checked={massBasis === b}
-                      onChange={() => {
-                        setMassBasis(b)
-                        confirm('massBasis')
+                      id="entered"
+                      type="text"
+                      inputMode="decimal"
+                      value={entered}
+                      autoComplete="off"
+                      className={rejections?.some((r) => r.code === 'C1-HI-02') ? 'bad' : undefined}
+                      onChange={(e) => {
+                        setEntered(e.target.value)
                         setCopied(null)
                       }}
                     />
-                    <span>{MASS_BASIS_LABEL[b]}</span>
-                  </label>
-                ))}
+                  </div>
+                  <div className="field">
+                    <div className="label-row">
+                      <label htmlFor="enteredunit">Unit</label>
+                      <InfoTip
+                        topic={enteredIsMass ? 'the mass concentration unit' : 'the molar concentration unit'}
+                        paragraphs={TOOLTIPS.concentrationUnit}
+                        align="end"
+                      />
+                    </div>
+                    <select
+                      id="enteredunit"
+                      value={enteredUnit}
+                      onChange={(e) => {
+                        setEnteredUnit(e.target.value as MassUnit | MolarUnit)
+                        setCopied(null)
+                      }}
+                    >
+                      <option value="" disabled>(select a unit)</option>
+                      {(enteredIsMass ? MASS_UNITS : MOLAR_UNITS).map((u) => (
+                        <option key={u} value={u}>{UNIT_LABEL[u]}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <p className="hint">Required. Neither the value nor its unit is defaulted or suggested.</p>
               </div>
-            </fieldset>
+            </section>
 
-            <div className="field">
-              <div className="label-row">
-                <label htmlFor="outunit">Report the result in</label>
-                <InfoTip topic="the result unit" paragraphs={TOOLTIPS.resultUnit} />
+            {/* C1-MW-01/02/03. Required, never inferred, unit always explicit. */}
+            <section className="panel" aria-labelledby="mw-h">
+              <div className="panel-head">
+                <div className="titles">
+                  <span className="step" aria-hidden="true">3</span>
+                  <h2 id="mw-h">Molecular weight</h2>
+                </div>
               </div>
-              {enteredIsMass ? (
-                <select id="outunit" value={outMolarUnit} onChange={(e) => setOutMolarUnit(e.target.value as MolarUnit)}>
-                  {MOLAR_UNITS.map((u) => (
-                    <option key={u} value={u}>{UNIT_LABEL[u]}</option>
-                  ))}
-                </select>
-              ) : (
-                <select id="outunit" value={outMassUnit} onChange={(e) => setOutMassUnit(e.target.value as MassUnit)}>
-                  {MASS_UNITS.map((u) => (
-                    <option key={u} value={u}>{UNIT_LABEL[u]}</option>
-                  ))}
-                </select>
-              )}
+              <div className="panel-body">
+                <div className="field-row">
+                  <div className="field">
+                    <div className="label-row">
+                      <label htmlFor="mw">
+                        Molecular weight
+                        {retained.has('mw') && <span className="retained">Retained, not re-confirmed</span>}
+                      </label>
+                      <InfoTip topic="the molecular weight" paragraphs={TOOLTIPS.mw} />
+                    </div>
+                    <input
+                      id="mw"
+                      type="text"
+                      inputMode="decimal"
+                      value={mw}
+                      autoComplete="off"
+                      className={rejections?.some((r) => r.code === 'C1-HI-01') ? 'bad' : undefined}
+                      onChange={(e) => {
+                        setMw(e.target.value)
+                        confirm('mw')
+                        setCopied(null)
+                      }}
+                    />
+                  </div>
+                  <div className="field">
+                    <div className="label-row">
+                      <label htmlFor="mwunit">Unit</label>
+                      <InfoTip topic="the molecular weight unit" paragraphs={TOOLTIPS.mwUnit} align="end" />
+                    </div>
+                    <select
+                      id="mwunit"
+                      value={mwUnit}
+                      onChange={(e) => {
+                        setMwUnit(e.target.value as MwUnit)
+                        confirm('mw')
+                        setCopied(null)
+                      }}
+                    >
+                      <option value="" disabled>(select a unit)</option>
+                      {MW_UNITS.map((u) => (
+                        <option key={u} value={u}>{UNIT_LABEL[u]}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* C1-MW-04/05. "Not recorded" is a value, not a blank. */}
+                <div className="field">
+                  <div className="label-row">
+                    <label htmlFor="prov">
+                      Source of that weight
+                      {retained.has('provenance') && <span className="retained">Retained, not re-confirmed</span>}
+                    </label>
+                    <InfoTip topic="the source of the weight" paragraphs={TOOLTIPS.provenance} />
+                  </div>
+                  <select
+                    id="prov"
+                    value={provenance}
+                    onChange={(e) => {
+                      setProvenance(e.target.value as MwProvenance)
+                      confirm('provenance')
+                      setCopied(null)
+                    }}
+                  >
+                    <option value="" disabled>(select a source)</option>
+                    {MW_PROVENANCE.map((p) => (
+                      <option key={p} value={p}>{MW_PROVENANCE_LABEL[p]}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/*
+                  C1-MW-07/08. Single-select, and radios rather than a dropdown.
+
+                  The options are not strictly exclusive in the abstract, a
+                  PE-conjugated scFv is both single-chain and conjugated, and §3.3
+                  resolves that by carrying the precedence rule inside the conjugate
+                  option's own label. A <select> truncates its options to the width
+                  of the control, which hides exactly the clause the rule depends on,
+                  and the URS is explicit that without it two people in the same lab
+                  answer differently for the same reagent. Radios show every label in
+                  full.
+                */}
+                <fieldset className="field">
+                  <legend>
+                    The stated weight is the mass of
+                    {retained.has('massBasis') && <span className="retained">Retained, not re-confirmed</span>}
+                    <InfoTip topic="what the weight is the mass of" paragraphs={TOOLTIPS.massBasis} />
+                  </legend>
+                  <div className="radios stacked">
+                    {MASS_BASIS.map((b) => (
+                      <label key={b}>
+                        <input
+                          type="radio"
+                          name="massBasis"
+                          value={b}
+                          checked={massBasis === b}
+                          onChange={() => {
+                            setMassBasis(b)
+                            confirm('massBasis')
+                            setCopied(null)
+                          }}
+                        />
+                        <span>{MASS_BASIS_LABEL[b]}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              </div>
+            </section>
+
+            <div className="method">
+              <section className="panel prose" aria-labelledby="howto-h">
+                <div className="panel-head">
+                  <h2 id="howto-h">How to use this tool</h2>
+                </div>
+                <div className="panel-body">
+                  <ol className="steps">
+                    {HOW_TO_USE.map((s) => (
+                      <li key={s.title}>
+                        <strong>{s.title}</strong>
+                        <p>{s.body}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </section>
+
+              {/*
+                Closed by default: a returning user does not need it open, and the
+                page is already longer than a laptop screen on a flagged result.
+              */}
+              <details className="panel prose examples">
+                <summary className="panel-head">
+                  <h2>Worked examples</h2>
+                </summary>
+                <div className="panel-body">
+                  <p>{WORKED_EXAMPLES_INTRO}</p>
+                  <ul className="example-list">
+                    {WORKED_EXAMPLES.map((x) => (
+                      <li key={x.title}>
+                        <strong>{x.title}</strong> <Emphasised text={x.body} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </details>
+
+              <section className="panel prose" aria-labelledby="why-h">
+                <div className="panel-head">
+                  <h2 id="why-h">Why this tool exists</h2>
+                </div>
+                <div className="panel-body">
+                  {WHY_THIS_TOOL_EXISTS.map((p) => <p key={p}>{p}</p>)}
+                </div>
+              </section>
+
+              {/* §9 / C1-FC-01. Required on the tool's own page, visible to the user. */}
+              <section className="panel prose" aria-labelledby="cannot-h">
+                <div className="panel-head">
+                  <h2 id="cannot-h">What this tool cannot detect</h2>
+                </div>
+                <div className="panel-body">
+                  <p>{CANNOT_DETECT_INTRO}</p>
+                  <ol className="failure-list">
+                    {UNDETECTABLE_FAILURES.map((f) => <li key={f}>{f}</li>)}
+                  </ol>
+                </div>
+              </section>
             </div>
-          </section>
+          </div>
 
-          <section className="panel" aria-labelledby="result-h" id="result">
-            <h2 id="result-h">Result</h2>
-
-            {rejections && rejections.map((r) => (
-              <p className="rejection" key={r.code}>
-                <code>{r.code}</code>
-                {r.message}
-              </p>
-            ))}
-
-            {!outcome && (
-              <p className="awaiting">
-                Enter a concentration with its unit, and declare a molecular weight with its unit, its
-                source, and what it is the mass of. All are required.
-              </p>
-            )}
-
-            {result && (
-              <>
-                <p className="result-value">
-                  {enteredIsMass ? result.displayed.molar : result.displayed.mass}
-                  <span className="unit">
-                    {UNIT_LABEL[enteredIsMass ? units.molar : units.mass]}
-                  </span>
+          <div className="rail">
+            <section className="panel" aria-labelledby="result-h" id="result">
+              <div className="panel-head">
+                <div className="titles">
+                  <h2 id="result-h">The result</h2>
+                </div>
+                {result && (
+                  <div className="actions">
+                    <button
+                      className="copy"
+                      type="button"
+                      onClick={() => {
+                        // C1-OUT-09, and C1-ST-01: the line carries the
+                        // declarations and every flag. A value cannot be taken
+                        // from here stripped of them.
+                        copyToClipboard(notebookLine(result), 'notebook')
+                      }}
+                    >
+                      {copied === 'notebook' ? 'Copied' : 'Copy for lab notebook'}
+                    </button>
+                    <button
+                      className="copy"
+                      type="button"
+                      onClick={() => {
+                        // C1-OUT-03. The structured object, with a unit on every
+                        // quantity and the unrounded values per C1-UN-07. C1's
+                        // own schema: open item 1 is still open and no ADC shape
+                        // has been invented to stand in for one.
+                        copyToClipboard(toJson(result), 'json')
+                      }}
+                    >
+                      {copied === 'json' ? 'Copied' : 'Copy structured result (JSON)'}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="panel-body">
+                <p className="hint lead">
+                  The result is shown with every declaration it was computed under.
                 </p>
-                <p className="result-from">
-                  from {entered} {UNIT_LABEL[enteredUnit as MassUnit | MolarUnit]}
-                </p>
 
-                <dl className="derivation">
-                  <div>
-                    <dt>Relation</dt>
-                    <dd>
-                      {/*
-                        C1-CV-03 exists so a reader can check the arithmetic.
-                        The relation carried its unit handling inside the same
-                        string until v0.1.1: "(mg/mL ÷ effective kDa → µM)",
-                        and "effective kDa" is not a unit; it was a name for the
-                        folded divisor, and a coined term cannot be evaluated.
-                        The relation is now named quantities only, and the unit
-                        handling is stated under it in standard units.
-                      */}
-                      {result.relation}
-                      <span className="sub">
-                        {result.unitHandling}{' '}
-                        Divisor: {formatSigFigs(result.effectiveMw)} {result.effectiveMwUnit}.
-                      </span>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Molecular weight</dt>
-                    <dd>{result.declarations.mwValue} {UNIT_LABEL[units.mw]}</dd>
-                  </div>
-                  <div>
-                    <dt>Source</dt>
-                    <dd>{MW_PROVENANCE_LABEL[result.declarations.provenance]}</dd>
-                  </div>
-                  <div>
-                    <dt>Mass of</dt>
-                    <dd>{MASS_BASIS_LABEL[result.declarations.massBasis]}</dd>
-                  </div>
-                  <div>
-                    <dt>Assumptions</dt>
-                    <dd>
-                      <ul className="assumptions">
-                        {result.assumptions.map((a) => <li key={a}>{a}</li>)}
-                      </ul>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Engine</dt>
-                    <dd>{result.engineVersion}</dd>
-                  </div>
-                </dl>
+                {rejections && rejections.map((r) => (
+                  <p className="rejection" key={r.code}>
+                    <code>{r.code}</code>
+                    {r.message}
+                  </p>
+                ))}
 
-                {result.flags.length === 0 ? (
-                  <div className="no-flags">
-                    <p>No flags raised.</p>
-                    {/*
-                      C1-OUT-08, NADIRA's round-7 ruling, conditional on
-                      shipping: see CLEAN_PANEL_SCOPE_STATEMENT. One line, so
-                      removal is a one-line change if it reads as a disclaimer
-                      at the bench rather than as scope.
-                    */}
-                    <p className="no-flags-scope">{result.statements.cleanPanelScope}</p>
+                {!outcome && (
+                  <div className="state-block incomplete">
+                    <h3>No result yet: declarations incomplete</h3>
+                    <ul>
+                      {missing.map((m) => <li key={m}>{m}</li>)}
+                    </ul>
                   </div>
-                ) : (
-                  result.flags.map((f) => (
-                    <p className="flag" key={f.code}>
-                      <code>{f.code}</code>
-                      {f.message}
-                    </p>
-                  ))
                 )}
 
-                <div className="statements">
-                  {/*
-                    Said where the confusion happens rather than in a footnote: a
-                    result one ULP below a threshold is flagged and displays
-                    identically to one exactly on it.
-                  */}
-                  {result.flags.some((f) => f.kind === 'threshold') && (
-                    <p>{result.statements.thresholdEvaluation}</p>
-                  )}
-                  <p>{result.statements.precision}</p>
-                  <p>{result.statements.moleculesNotSites}</p>
-                  <p><strong>{result.statements.scope}</strong></p>
-                </div>
+                {result && (
+                  <>
+                    <p className="result-value">
+                      {enteredIsMass ? result.displayed.molar : result.displayed.mass}
+                      <span className="unit">
+                        {UNIT_LABEL[enteredIsMass ? units.molar : units.mass]}
+                      </span>
+                    </p>
+                    <p className="result-from">
+                      from {entered} {UNIT_LABEL[enteredUnit as MassUnit | MolarUnit]}
+                    </p>
 
-                <div className="actions">
-                  <button
-                    className="copy"
-                    type="button"
-                    onClick={() => {
-                      // C1-OUT-09, and C1-ST-01: the line carries the
-                      // declarations and every flag. A value cannot be taken
-                      // from here stripped of them.
-                      copyToClipboard(notebookLine(result), 'notebook')
-                    }}
-                  >
-                    {copied === 'notebook' ? 'Copied' : 'Copy for lab notebook'}
-                  </button>
-                  <button
-                    className="copy"
-                    type="button"
-                    onClick={() => {
-                      // C1-OUT-03. The structured object, with a unit on every
-                      // quantity and the unrounded values per C1-UN-07. C1's
-                      // own schema: open item 1 is still open and no ADC shape
-                      // has been invented to stand in for one.
-                      copyToClipboard(toJson(result), 'json')
-                    }}
-                  >
-                    {copied === 'json' ? 'Copied' : 'Copy structured result (JSON)'}
-                  </button>
-                </div>
-              </>
-            )}
-          </section>
+                    <dl className="derivation">
+                      <div>
+                        <dt>Relation</dt>
+                        <dd>
+                          {/*
+                            C1-CV-03 exists so a reader can check the arithmetic.
+                            The relation carried its unit handling inside the same
+                            string until v0.1.1: "(mg/mL ÷ effective kDa → µM)",
+                            and "effective kDa" is not a unit; it was a name for the
+                            folded divisor, and a coined term cannot be evaluated.
+                            The relation is now named quantities only, and the unit
+                            handling is stated under it in standard units.
+                          */}
+                          {result.relation}
+                          <span className="sub">
+                            {result.unitHandling}{' '}
+                            Divisor: {formatSigFigs(result.effectiveMw)} {result.effectiveMwUnit}.
+                          </span>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Molecular weight</dt>
+                        <dd>{result.declarations.mwValue} {UNIT_LABEL[units.mw]}</dd>
+                      </div>
+                      <div>
+                        <dt>Source</dt>
+                        <dd>{MW_PROVENANCE_LABEL[result.declarations.provenance]}</dd>
+                      </div>
+                      <div>
+                        <dt>Mass of</dt>
+                        <dd>{MASS_BASIS_LABEL[result.declarations.massBasis]}</dd>
+                      </div>
+                      <div>
+                        <dt>Assumptions</dt>
+                        <dd>
+                          <ul className="assumptions">
+                            {result.assumptions.map((a) => <li key={a}>{a}</li>)}
+                          </ul>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Engine</dt>
+                        <dd>{result.engineVersion}</dd>
+                      </div>
+                    </dl>
+
+                    {result.flags.length === 0 ? (
+                      <div className="no-flags">
+                        <p>No flags raised.</p>
+                        {/*
+                          C1-OUT-08, NADIRA's round-7 ruling, conditional on
+                          shipping: see CLEAN_PANEL_SCOPE_STATEMENT. One line, so
+                          removal is a one-line change if it reads as a disclaimer
+                          at the bench rather than as scope.
+                        */}
+                        <p className="no-flags-scope">{result.statements.cleanPanelScope}</p>
+                      </div>
+                    ) : (
+                      result.flags.map((f) => (
+                        <p className="flag" key={f.code}>
+                          <code>{f.code}</code>
+                          {f.message}
+                        </p>
+                      ))
+                    )}
+
+                    <div className="statements">
+                      {/*
+                        Said where the confusion happens rather than in a footnote: a
+                        result one ULP below a threshold is flagged and displays
+                        identically to one exactly on it.
+                      */}
+                      {result.flags.some((f) => f.kind === 'threshold') && (
+                        <p>{result.statements.thresholdEvaluation}</p>
+                      )}
+                      <p>{result.statements.precision}</p>
+                      <p>{result.statements.moleculesNotSites}</p>
+                      <p><strong>{result.statements.scope}</strong></p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </section>
+          </div>
         </main>
 
         {/*
-          Below the converter, deliberately. C1-NF-03 and acceptance 20 measure
-          `main.converter`, so a panel outside it cannot move either, and the
-          default rendering with no parameter is byte-identical to before.
+          Below the converter, deliberately, so the default rendering with no
+          parameter carries no trace of it.
 
           `toJson(result)` is THE SAME CALL the copy button makes. Not a second
           serialisation path: a divergence between what is shown and what is
           copied would be invisible and would defeat the point of showing it.
-          `check-ui.mjs` asserts the two are character-identical.
         */}
         {SHOW_RECORD && result && (
           <section className="panel record" aria-labelledby="record-h">
-            <h2 id="record-h">Structured result</h2>
-            <p style={{ marginTop: 0 }}>
-              C1-OUT-03, rendered from the same computation and the same serialiser the copy
-              button uses. Shown because <code>?record</code> is in the address; nothing here is
-              stored, and no input is populated from the address.
-            </p>
-            <pre className="record-json">{toJson(result)}</pre>
+            <div className="panel-head">
+              <h2 id="record-h">Structured result</h2>
+            </div>
+            <div className="panel-body">
+              <p style={{ marginTop: 0 }}>
+                C1-OUT-03, rendered from the same computation and the same serialiser the copy
+                button uses. Shown because <code>?record</code> is in the address; nothing here is
+                stored, and no input is populated from the address.
+              </p>
+              <pre className="record-json">{toJson(result)}</pre>
+            </div>
           </section>
         )}
-
-        <div className="disclosure">
-          <section className="panel prose" aria-labelledby="howto-h">
-            <h2 id="howto-h">How to use this tool</h2>
-            <ol className="steps">
-              {HOW_TO_USE.map((s) => (
-                <li key={s.title}>
-                  <strong>{s.title}</strong>
-                  <p>{s.body}</p>
-                </li>
-              ))}
-            </ol>
-          </section>
-
-          {/*
-            Closed by default: a returning user does not need it open, and the
-            page is already longer than a laptop screen on a flagged result.
-          */}
-          <details className="panel prose examples">
-            <summary>
-              <h2>Worked examples</h2>
-            </summary>
-            <p>{WORKED_EXAMPLES_INTRO}</p>
-            <ul className="example-list">
-              {WORKED_EXAMPLES.map((x) => (
-                <li key={x.title}>
-                  <strong>{x.title}</strong> <Emphasised text={x.body} />
-                </li>
-              ))}
-            </ul>
-          </details>
-
-          <section className="panel prose" aria-labelledby="why-h">
-            <h2 id="why-h">Why this tool exists</h2>
-            {WHY_THIS_TOOL_EXISTS.map((p) => <p key={p}>{p}</p>)}
-          </section>
-
-          {/* §9 / C1-FC-01. Required on the tool's own page, visible to the user. */}
-          <section className="panel prose" aria-labelledby="cannot-h">
-            <h2 id="cannot-h">What this tool cannot detect</h2>
-            <p>{CANNOT_DETECT_INTRO}</p>
-            <ol className="failure-list">
-              {UNDETECTABLE_FAILURES.map((f) => <li key={f}>{f}</li>)}
-            </ol>
-          </section>
-        </div>
 
         {/*
           C1-NF-01 is an environment claim about the SERVED page, and acceptance

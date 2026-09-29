@@ -13,7 +13,7 @@ computer.
 Live at
 **[benchtools.ligant.ai/molarity-converter](https://benchtools.ligant.ai/molarity-converter/)**.
 Source at
-**[github.com/abmodi-ai/Ligant.ai-Molarity-Converter](https://github.com/abmodi-ai/Ligant.ai-Molarity-Converter)**,
+**[github.com/Ligant-AI/C1-Molarity-Converter](https://github.com/Ligant-AI/C1-Molarity-Converter)**,
 linked from the footer of the tool itself so the licence on the page can be
 checked by the reader it is addressed to.
 
