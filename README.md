@@ -161,14 +161,27 @@ what is here.
 
 ## Privacy
 
-Nothing you enter is transmitted, and the page contacts no third party.
-`src/` contains no `fetch`, no `XMLHttpRequest`, and no other network
-primitive: a property you can confirm yourself by reading the source,
-rather than just trusting this sentence.
+Nothing you enter is transmitted. `src/` contains no `fetch`, no
+`XMLHttpRequest`, and no other network primitive: a property you can confirm
+yourself by reading the source, rather than just trusting this sentence.
 
-- No analytics script, no error reporting, no telemetry.
-- Nothing persists between visits. There is no localStorage, no
-  sessionStorage and no URL state that repopulates an input.
+The hosted page carries the suite's standard privacy statement and the
+analytics it discloses:
+
+- **Cloudflare Web Analytics**, added by the host for every visitor. It counts
+  visits and page-load speed, sets no cookie, and never reads what you type.
+- **Google Analytics, only if you allow it.** The suite footer
+  (`@ligant/bench-chrome`) shows a banner; until you click Allow, nothing is
+  requested from Google and nothing is stored. After Allow, Google Analytics
+  sets two cookies and records which pages you visit. It never receives
+  anything you type: the suite's `check-consent.mjs` types a marker into every
+  field and fails if it appears in any request. "Privacy choices" in the footer
+  reopens the banner. See the [Privacy Policy](https://ligant.ai/privacy#google-analytics).
+- No error reporting, and no telemetry of what you enter.
+- Nothing you enter persists between visits. There is no URL state that
+  repopulates an input. The only thing the page can store is your answer to
+  the banner (one `localStorage` entry, `ligant_privacy_choice`) and, after
+  Allow, the Google Analytics cookies.
 
 **The footer states only what has actually been verified**, with one
 deliberately conditional claim. Whether the deployed address itself (not
