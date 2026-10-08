@@ -177,6 +177,9 @@ export interface Threshold {
   readonly boundaryCoverage?: true
 }
 
+// Each row keeps its value, basis and a short status. The audit trail behind
+// each status (rulings, attributions, measurements, dates) is in
+// docs/register-audit-trail.md, so it is kept without shipping in the bundle.
 export const CONSTANTS_REGISTER: readonly Threshold[] = [
   {
     id: 'round-trip-tolerance',
@@ -184,9 +187,9 @@ export const CONSTANTS_REGISTER: readonly Threshold[] = [
     value: '1 ULP, compared with ≤',
     basis: 'derived',
     status:
-      'Derived, and a REQUIREMENT ON HOW THE CONVERSION IS STRUCTURED rather than an observation about it. The bound holds only because the unit factors are folded into a single divisor, so a round trip is two operations and not six, and folding is required for two independent reasons. Rounding: the stepwise path reaches 3.0 ULP and exceeds the bound in 0.54% of cases, against 1.0 ULP and zero exceedances folded. Range: the stepwise intermediate underflows where the folded divisor does not, so 1e-320 mg/mL at 1000 kDa returns 0 stepwise and 1e-320 in µM folded. A tool inheriting this row as an observation would fail the bound and lose range. APPLIES TO RESULTS THE CHOSEN UNITS CAN REPRESENT: once a result underflows, the ULP distance is unbounded and is not a rounding difference. Measured: 500,000 random pairs, MW 10³ to 10⁶ g/mol, 11 decades, both directions; worst observed error exactly 1.0 ULP, zero cases exceeding.',
+      'Derived. Holds because the unit factors are folded into a single divisor rather than applied as a chain. Applies to results the chosen units can represent.',
   },
-  { boundaryCoverage: true, id: 'mw-lower', label: 'Lower MW plausibility bound', value: '1 kDa', basis: 'inspection', status: 'Uncharacterised: open item 2' },
+  { boundaryCoverage: true, id: 'mw-lower', label: 'Lower MW plausibility bound', value: '1 kDa', basis: 'inspection', status: 'Chosen by inspection; not yet characterised.' },
   {
     boundaryCoverage: true,
     id: 'mw-upper',
@@ -201,7 +204,7 @@ export const CONSTANTS_REGISTER: readonly Threshold[] = [
     // this bound ordinary, and the constant and the declaration were changed in
     // the same document without either being checked against the other.
     status:
-      'Uncharacterised: open item 2. APPLIES WHEN THE MASS BASIS IS NOT A CONJUGATE; a conjugate is measured against its own row below. It misfired on IgM–PE at 1210 kDa until 10 September 2026, because adding the conjugate declaration at v0.4 made masses above this bound ordinary and the bound was not revisited. Resolved by conditioning it on the declaration rather than by raising it, so the coupling is in the code rather than in someone\'s memory.',
+      'Chosen by inspection; not yet characterised. Applies when the mass basis is not a conjugate; a conjugate is measured against its own row below.',
   },
   {
     boundaryCoverage: true,
@@ -210,7 +213,7 @@ export const CONSTANTS_REGISTER: readonly Threshold[] = [
     value: '2000 kDa',
     basis: 'inspection',
     status:
-      'Uncharacterised: open item 2. The conditional form and this figure are both NADIRA\'s; what remains uncharacterised is the number itself. Basis: the largest routine label is not R-phycoerythrin at 240 kDa but the Brilliant Violet polymers. Streptavidin–BV421 averages 340 kDa against 52 kDa for streptavidin alone, so the polymer contributes about 290 kDa, and IgM with BV421 reaches roughly 1260 kDa. 2000 kDa clears that with room for about three labels, while a 1000-fold unit error on any plausible weight lands two orders above, so detection is preserved in both directions. NOT CHECKED: BUV polymers, and heavily labelled conjugates. That residual is stated because the mechanism which produced the original defect was assuming the top end, and the next person should read what was not verified rather than rediscover it the way IgM was rediscovered.',
+      'Chosen by inspection; not yet characterised. Applies when the mass basis is a conjugate. Not checked against BUV polymers or heavily labelled conjugates.',
   },
   {
     boundaryCoverage: true,
@@ -219,16 +222,16 @@ export const CONSTANTS_REGISTER: readonly Threshold[] = [
     value: '250 mg/mL',
     basis: 'inspection',
     status:
-      'Uncharacterised: open item 3. Round 7: near this figure the solute\'s own volume is no longer negligible, so a concentration per volume of solution and one per volume of solvent start to diverge; C1-FL-02 names the ambiguity where it fires.',
+      'Chosen by inspection; not yet characterised. Near this figure a concentration per volume of solution and one per volume of solvent start to diverge; C1-FL-02 names this where it fires.',
   },
-  { boundaryCoverage: true, id: 'molar-lower', label: 'Lower molar concentration bound', value: '1 pM', basis: 'inspection', status: 'Uncharacterised: open item 3' },
+  { boundaryCoverage: true, id: 'molar-lower', label: 'Lower molar concentration bound', value: '1 pM', basis: 'inspection', status: 'Chosen by inspection; not yet characterised.' },
   {
     id: 'viewport-supported',
-    label: 'Viewport at which C1-NF-03 is met',
+    label: 'Viewport at which inputs and result fit one screen',
     value: '879px of viewport height for a clean result; NOT MET for a flagged result at any viewport measured',
     basis: 'inspection',
     status:
-      'ACCEPTED DEVIATION, declared rather than met. C1-NF-03 and acceptance 20 require the inputs and the result to fit one screen without scrolling. Measured 11 September 2026 at 1440 wide: a clean result reaches 868px and fits only from about 879px of viewport, which is a 14-inch class display; the worst case, five flags, reaches 1012px and fits nowhere measured. On a 1440x900 laptop (797px of viewport) a CLEAN result loses the foot of the input column, and a FLAGGED result loses the scope statement, the copy buttons and the tail of the flag list, so the user sees the number without the warnings attached to it. That inverts the guarantee the tool is built around and it is the reason this row exists rather than staying an unwritten shortfall. The supported viewport is undecided, open item 15, and the layout is deliberately not compacted in the meantime.',
+      'Accepted deviation, declared rather than met. A clean result fits one screen from about 879px of viewport height; a flagged result does not fit at any viewport measured.',
   },
   {
     boundaryCoverage: true,
@@ -237,7 +240,7 @@ export const CONSTANTS_REGISTER: readonly Threshold[] = [
     value: '4.94e-324 in the reported unit (the smallest positive double)',
     basis: 'derived',
     status:
-      'Derived from IEEE 754 double precision, not chosen. A computed quantity below this is reported as 0 and marked `underflowed` in the structured object; a bare 0 there is not a rounded value but a different number. It is the CHOICE OF UNIT that decides representability rather than the value alone: 1e-320 mg/mL at 1000 kDa underflows reported in M and is exact reported in pM. Listed under C1-CN-01 because it is a threshold at which the output changes, even though it is not a §8 flag condition. How an underflowed result is PRESENTED is open item 16 and is not settled by this row.',
+      'Derived from IEEE 754 double precision, not chosen. Below this a computed quantity is reported as 0 and marked underflowed. The chosen unit decides representability: 1e-320 mg/mL at 1000 kDa underflows in M and is representable in pM, as a subnormal value with reduced precision.',
   },
   {
     id: 'displayed-precision',
@@ -253,7 +256,7 @@ export const CONSTANTS_REGISTER: readonly Threshold[] = [
     // owner's decision on her behalf: precisely the kind of silent
     // behaviour-determining choice §11 exists to prevent.
     status:
-      'Proposed: open item 7 remains OPEN. Measured as evaluable at build with seven orders of headroom before C1-IV-03 fails (docs/open-item-07-displayed-precision.md). The measurement is with the developer; the decision is NADIRA\'s and has not been made.',
+      'Proposed; not yet decided.',
   },
   {
     id: 'reimplementation-tolerance',
@@ -261,7 +264,7 @@ export const CONSTANTS_REGISTER: readonly Threshold[] = [
     value: '≤ 1 ULP, compared with ≤',
     basis: 'derived',
     status:
-      'Requirement, not an observation. Bit-identical is what was measured, but making it the requirement would generalise one measured pair into a claim about all future reimplementations: a language with wider intermediates or FMA contraction can differ in the last bit on the same two operations, and bit-identical would then fail on correct code. APPLIES TO RESULTS THE CHOSEN UNITS CAN REPRESENT, on the same terms as the round-trip row: an implementation with a wider exponent range returns a small positive number where this returns zero, and that disagreement is unbounded in ULP terms rather than being a rounding difference. C1-FX-03b and C1-FX-14 put both regimes in the reference set, so the qualifier is exercised rather than asserted. Observed: 0 ULP over the comparison set, so any drift from exact agreement is visible rather than absorbed. Consequence, stated rather than left implicit: a defect uniformly smaller than 1 ULP is invisible to acceptance tests 3 and 5 alike.',
+      'Derived. A requirement, not an observation. Applies to results the chosen units can represent.',
   },
   {
     id: 'rounding-mode',
@@ -269,7 +272,7 @@ export const CONSTANTS_REGISTER: readonly Threshold[] = [
     value: 'half-to-even',
     basis: 'derived',
     status:
-      'IEEE 754 default, and the default in Python, R and Julia, so an independent reimplementation agrees without being told. Unbiased under repeated rounding, where half-up drifts upward. Not a threshold, but behaviour-determining: 1 g/L at 51.2 kDa is exactly 19.53125 µM and its displayed value is decided by this row alone.',
+      'Derived. The IEEE 754 default, and the default in Python, R and Julia.',
   },
 ] as const
 
@@ -586,7 +589,7 @@ export const UNDETECTABLE_FAILURES: readonly string[] = [
   'A monomer mass quoted where the assembled mass was needed, or the reverse; C1-MW-07 compels the declaration but cannot verify it.',
   'A unit-magnitude transcription error where the entered weight still falls inside the plausible range. C1-FL-01 catches a 1000× error that lands outside 1–1000 kDa; it cannot catch one that lands inside, and it cannot distinguish a genuinely unusual protein from a typo.',
   'Any error in the input concentration itself.',
-  'That a result shown as 0.00000 is a real concentration too small to represent in the unit you chose, rather than an empty solution. The tool DOES detect this and records it, so what it cannot do is show you the value: the two cases are indistinguishable on screen by eye. Reporting the result in a smaller unit is usually enough. 1e-320 mg/mL of a 1000 kDa protein is zero in M and exact in pM.',
+  'That a result shown as 0.00000 is a real concentration too small to represent in the unit you chose, rather than an empty solution. The tool DOES detect this and records it, so what it cannot do is show you the value: the two cases are indistinguishable on screen by eye. Reporting the result in a smaller unit is usually enough. 1e-320 mg/mL of a 1000 kDa protein is zero in M and representable in pM.',
   'A conjugate mass declared as unconjugated, or the reverse; C1-MW-07 compels the declaration but cannot verify it, as above.',
   'Whether a stated concentration is per volume of solution or per volume of solvent. The tool\'s arithmetic never uses solute volume, so the two are indistinguishable to it, but they are not the same number: near 250 mg/mL, a partial specific volume around 0.73 mL/g means the solute occupies roughly 18% of the volume, and C1-FL-02 names this where it fires.',
 ] as const
