@@ -28,7 +28,7 @@ authors:
 # Matches APP_VERSION in src/lib/site.ts and the tag on the archived release.
 # The leading v is kept so that this file, the footer and the tag are the
 # same string rather than three conventions for one version.
-version: v0.1.1
+version: v0.1.2
 # The day the tag was cut and the release archived, not the day this file
 # was first drafted.
 date-released: '2026-09-16'

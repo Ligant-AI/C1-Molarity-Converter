@@ -41,7 +41,7 @@ export const TOOLTIPS = {
     'Where the number came from: a certificate of analysis, a vendor datasheet, calculated from sequence, or mass spectrometry. "Not recorded" is a real answer and appears on the result. A sequence-derived weight excludes glycosylation where it is present.',
   ],
   massBasis: [
-    'The same protein has more than one correct molecular weight depending on what is being weighed. A subunit mass used where the assembled mass was needed is out by a factor of two or four. A conjugate mass includes the label, which for a phycoerythrin conjugate is heavier than the antibody.',
+    'The same protein has more than one correct molecular weight depending on what is being weighed. A subunit mass quoted where the assembled mass was needed is wrong by the ratio of the two: about 2 for a half-antibody or a homodimeric Fc fusion, about 3 for an IgG heavy chain, about 6 for an IgG light chain. A conjugate mass includes the label, which for a phycoerythrin conjugate is heavier than the antibody.',
     'Pick conjugate whenever a label or payload is in the stated mass, whatever the format underneath.',
   ],
   resultUnit: [
@@ -115,7 +115,7 @@ export const WORKED_EXAMPLES: readonly Step[] = [
 
 export const WHY_THIS_TOOL_EXISTS: readonly string[] = [
   'Converting nM to µg/mL requires a molecular weight, and in practice that weight is guessed, carried over from a different construct, or taken from a sequence when the protein is glycosylated.',
-  'Two errors are common and neither is visible in the resulting number. A subunit mass quoted where the assembled mass was needed is a factor of two or four for an IgG, a bispecific, an scFv-Fc or a VHH construct. A conjugate mass used for the underlying protein matters in flow cytometry, where R-phycoerythrin is roughly 240 kDa against 150 kDa for the antibody it is attached to.',
+  'Two errors are common and neither is visible in the resulting number. A subunit mass quoted where the assembled mass was needed is wrong by the ratio of the two: about 2 for a half-antibody or a homodimeric Fc fusion, about 3 for an IgG heavy chain, about 6 for an IgG light chain. A conjugate mass used for the underlying protein matters in flow cytometry, where R-phycoerythrin is roughly 240 kDa against 150 kDa for the antibody it is attached to.',
   'A spreadsheet produces a clean, plausible number in all of these cases and keeps no record of which one you were in.',
   'So this tool will not complete a conversion without a molecular weight, and never supplies or suggests one. It asks where the weight came from, with "not recorded" accepted as an answer that appears on the output. It asks what the weight is the mass of. All three appear with the result and in the machine-readable record, so the number can be checked later by someone who was not there when it was produced.',
 ]
