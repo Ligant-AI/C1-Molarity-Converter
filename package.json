@@ -1,7 +1,7 @@
 {
   "name": "ligant-molarity-converter",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "Apache-2.0",
   "type": "module",
   "description": "Molarity Converter for Biologics (C1) - deterministic, client-side mass/molar concentration conversion with compelled molecular-weight declarations",
@@ -20,7 +20,7 @@
     "vite": "^5.4.21"
   },
   "dependencies": {
-    "@ligant/bench-chrome": "file:vendor/ligant-bench-chrome-1.2.0.tgz",
+    "@ligant/bench-chrome": "file:vendor/ligant-bench-chrome-1.3.1.tgz",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   }
