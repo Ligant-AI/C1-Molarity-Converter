@@ -19,7 +19,7 @@ abstract: >-
   concentration for a protein whose molecular weight the user declares,
   along with its source and what that weight is the mass of. No molecular
   weight is supplied, inferred, defaulted or looked up, and no data entered
-  by a user leaves the browser.
+  into the converter leaves the browser.
 authors:
   - family-names: Modi
     given-names: A.B.
@@ -28,7 +28,7 @@ authors:
 # Matches APP_VERSION in src/lib/site.ts and the tag on the archived release.
 # The leading v is kept so that this file, the footer and the tag are the
 # same string rather than three conventions for one version.
-version: v0.1.2
+version: v0.1.3
 # The day the tag was cut and the release archived, not the day this file
 # was first drafted.
 date-released: '2026-09-16'

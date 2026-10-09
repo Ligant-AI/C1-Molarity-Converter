@@ -39,7 +39,7 @@ export const REPO_URL = 'https://github.com/Ligant-AI/C1-Molarity-Converter'
  * so a release that bumps one and not the others fails the build instead of
  * shipping a footer that disagrees with its own citation.
  */
-export const APP_VERSION = 'v0.1.2'
+export const APP_VERSION = 'v0.1.3'
 
 /**
  * The year the citation carries. Fixed, not derived from the clock, so the
