@@ -1,6 +1,6 @@
 import { ENGINE_VERSION, convert, effectiveMw, effectiveMwUnit, relationApplied, unitHandling, type ConversionUnits, type Direction, } from './convert';
 import { DISPLAY_SIG_FIGS, PRECISION_STATEMENT, formatSigFigs } from './format';
-import { CLEAN_PANEL_SCOPE_STATEMENT, MOLECULES_NOT_SITES_STATEMENT, SCOPE_STATEMENT, THRESHOLD_EVALUATION_STATEMENT, raiseFlags, type Flag, } from './flags';
+import { CLEAN_PANEL_SCOPE_STATEMENT, MOLECULES_NOT_SITES_STATEMENT, SCOPE_STATEMENT, THRESHOLD_EVALUATION_STATEMENT, flagLabel, raiseFlags, type Flag, } from './flags';
 import { checkConcentration, checkMolecularWeight, type Rejection } from './validate';
 import { MASS_BASIS_LABEL, MW_PROVENANCE_LABEL, UNIT_LABEL, type MassBasis, type MwProvenance, } from './units';
 import { NOTHING_RETAINED, type RetainedFields } from './retention';
@@ -125,7 +125,7 @@ export function notebookLine(result: ConversionResult): string {
     const head = `${displayed.mass} ${UNIT_LABEL[units.mass]} = ${displayed.molar} ${UNIT_LABEL[units.molar]}`;
     const mw = `MW ${declarations.mwValue} ${UNIT_LABEL[units.mw]} (${MW_PROVENANCE_LABEL[declarations.provenance]}; ${MASS_BASIS_LABEL[declarations.massBasis]})`;
     const flags = result.flags.length
-        ? ` | flags: ${result.flags.map((f) => f.code).join(', ')}`
+        ? ` | flags: ${result.flags.map((f) => flagLabel(f.code)).join(', ')}`
         : ' | no flags';
-    return `${head} | ${mw}${flags} | ${DISPLAY_SIG_FIGS} s.f. | Molarity Converter engine ${result.engineVersion} | ${SCOPE_STATEMENT}`;
+    return `${head} | ${mw}${flags} | ${DISPLAY_SIG_FIGS} s.f. | Ligant Bench Tools: Molarity Converter, engine ${result.engineVersion} | ${SCOPE_STATEMENT}`;
 }

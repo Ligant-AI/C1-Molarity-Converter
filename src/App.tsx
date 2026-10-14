@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { MASS_BASIS, MASS_BASIS_LABEL, MASS_UNITS, MOLAR_UNITS, MW_PROVENANCE, MW_PROVENANCE_LABEL, MW_UNITS, UNIT_LABEL, type MassBasis, type MassUnit, type MolarUnit, type MwProvenance, type MwUnit, } from './lib/units';
-import type { Direction } from './lib/convert';
+import { ENGINE_VERSION, type Direction } from './lib/convert';
 import { computeConversion, notebookLine } from './lib/compute';
 import { toJson } from './lib/serialise';
-import { UNDETECTABLE_FAILURES } from './lib/flags';
-import { CANNOT_DETECT_INTRO, HOW_TO_USE, TOOLTIPS, WHY_THIS_TOOL_EXISTS, WORKED_EXAMPLES, WORKED_EXAMPLES_INTRO, } from './lib/copy';
+import { SCOPE_STATEMENT, UNDETECTABLE_FAILURES, flagLabel } from './lib/flags';
+import { CONSTANTS_AND_ASSUMPTIONS, DOES_NOT_ALSO, DOES_NOT_INTRO, FLAG_LEGEND, FLAG_LEGEND_INTRO, HOW_IT_WORKS_FORMULAE, HOW_IT_WORKS_INTRO, HOW_TO_USE, PRECISION_NOTE, TOOLTIPS, WHAT_IT_DOES, WHY_NOT_A_SPREADSHEET, WHY_NOT_A_SPREADSHEET_INTRO, WORKED_EXAMPLES, WORKED_EXAMPLES_INTRO, } from './lib/copy';
 import { confirmField, retainedOnDirectionChange, toRetainedFields, type RetainableField } from './lib/retention';
 import { APP_VERSION, TOOL_NAME } from './lib/site';
 import { LigantMark, SuiteFooter, SuiteHeader } from '@ligant/bench-chrome/react';
@@ -258,54 +258,81 @@ export function App() {
             </section>
 
             <div className="method">
-              <section className="panel prose" aria-labelledby="howto-h">
+              <section className="panel prose method-panel" aria-labelledby="about-h">
                 <div className="panel-head">
-                  <h2 id="howto-h">How to use this tool</h2>
+                  <div className="titles">
+                    <h2 id="about-h">About this calculator</h2>
+                  </div>
                 </div>
                 <div className="panel-body">
+                  <h3>What it does</h3>
+                  {WHAT_IT_DOES.map((p) => <p key={p}>{p}</p>)}
+
+                  <h3>How to use it</h3>
                   <ol className="steps">
                     {HOW_TO_USE.map((s) => (<li key={s.title}>
                         <strong>{s.title}</strong>
                         <p>{s.body}</p>
                       </li>))}
                   </ol>
-                </div>
-              </section>
+                  
+                  <details className="examples">
+                    <summary>
+                      <h4>Worked examples</h4>
+                    </summary>
+                    <p>{WORKED_EXAMPLES_INTRO}</p>
+                    <ul className="example-list">
+                      {WORKED_EXAMPLES.map((x) => (<li key={x.title}>
+                          <strong>{x.title}</strong> <Emphasised text={x.body}/>
+                        </li>))}
+                    </ul>
+                  </details>
 
-              
-              <details className="panel prose examples">
-                <summary className="panel-head">
-                  <h2>Worked examples</h2>
-                </summary>
-                <div className="panel-body">
-                  <p>{WORKED_EXAMPLES_INTRO}</p>
+                  <h3>How it works</h3>
+                  {HOW_IT_WORKS_INTRO.map((p) => <p key={p}>{p}</p>)}
+                  <p className="formulae">
+                    {HOW_IT_WORKS_FORMULAE.map((f) => <code key={f}>{f}</code>)}
+                  </p>
+                  <h4>Constants and assumptions</h4>
+                  <div className="table-scroll">
+                    <table className="plain-table">
+                      <thead>
+                        <tr><th>Name</th><th>Value</th><th>Why</th></tr>
+                      </thead>
+                      <tbody>
+                        {CONSTANTS_AND_ASSUMPTIONS.map((r) => (<tr key={r.name}><td>{r.name}</td><td>{r.value}</td><td>{r.why}</td></tr>))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <h4>Precision, rounding and engine version</h4>
+                  <p>{PRECISION_NOTE}</p>
+                  <p>Engine {ENGINE_VERSION}. The version changes whenever the calculation changes, so two results with the same engine version come from the same arithmetic.</p>
+                  <h4>Flags</h4>
+                  <p>{FLAG_LEGEND_INTRO}</p>
+                  <div className="table-scroll">
+                    <table className="plain-table">
+                      <thead>
+                        <tr><th>Code</th><th>What it means</th><th>What to do</th></tr>
+                      </thead>
+                      <tbody>
+                        {FLAG_LEGEND.map((r) => (<tr key={r.code}><td><code>{r.code}</code></td><td>{r.means}</td><td>{r.action}</td></tr>))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <h3>Why not a spreadsheet?</h3>
+                  <p>{WHY_NOT_A_SPREADSHEET_INTRO}</p>
                   <ul className="example-list">
-                    {WORKED_EXAMPLES.map((x) => (<li key={x.title}>
-                        <strong>{x.title}</strong> <Emphasised text={x.body}/>
-                      </li>))}
+                    {WHY_NOT_A_SPREADSHEET.map((t) => (<li key={t}><Emphasised text={t}/></li>))}
                   </ul>
-                </div>
-              </details>
 
-              <section className="panel prose" aria-labelledby="why-h">
-                <div className="panel-head">
-                  <h2 id="why-h">Why this tool exists</h2>
-                </div>
-                <div className="panel-body">
-                  {WHY_THIS_TOOL_EXISTS.map((p) => <p key={p}>{p}</p>)}
-                </div>
-              </section>
-
-              
-              <section className="panel prose" aria-labelledby="cannot-h">
-                <div className="panel-head">
-                  <h2 id="cannot-h">What this tool cannot detect</h2>
-                </div>
-                <div className="panel-body">
-                  <p>{CANNOT_DETECT_INTRO}</p>
+                  <h3>What it does not do</h3>
+                  <p>{DOES_NOT_INTRO}</p>
                   <ol className="failure-list">
                     {UNDETECTABLE_FAILURES.map((f) => <li key={f}>{f}</li>)}
                   </ol>
+                  {DOES_NOT_ALSO.map((p) => <p key={p}>{p}</p>)}
+                  <p><strong>{SCOPE_STATEMENT}</strong></p>
                 </div>
               </section>
             </div>
@@ -336,7 +363,6 @@ export function App() {
                 </p>
 
                 {rejections && rejections.map((r) => (<p className="rejection" key={r.code}>
-                    <code>{r.code}</code>
                     {r.message}
                   </p>))}
 
@@ -401,7 +427,7 @@ export function App() {
                         
                         <p className="no-flags-scope">{result.statements.cleanPanelScope}</p>
                       </div>) : (result.flags.map((f) => (<p className="flag" key={f.code}>
-                          <code>{f.code}</code>
+                          <code>{flagLabel(f.code)}</code>
                           {f.message}
                         </p>)))}
 
@@ -425,8 +451,8 @@ export function App() {
             </div>
             <div className="panel-body">
               <p style={{ marginTop: 0 }}>
-                C1-OUT-03, rendered from the same computation and the same serialiser the copy
-                button uses. Shown because <code>?record</code> is in the address; nothing here is
+                The structured result, rendered from the same computation and the same
+                serialiser the copy button uses. Shown because <code>?record</code> is in the address; nothing here is
                 stored, and no input is populated from the address.
               </p>
               <pre className="record-json">{toJson(result)}</pre>

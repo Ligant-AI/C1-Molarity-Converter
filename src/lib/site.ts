@@ -3,7 +3,6 @@ export const TOOL_PATH = '/molarity-converter/';
 export const DEPLOYED_URL = `${SITE_URL}${TOOL_PATH}`;
 export const TOOL_NAME = 'Molarity Converter for Biologics';
 export const TOOL_ID = 'C1';
-export const URS_VERSION = '0.5';
 export const REPO_URL = 'https://github.com/Ligant-AI/C1-Molarity-Converter';
 export const APP_VERSION = 'v0.1.3';
 export const RELEASE_YEAR = 2026;
