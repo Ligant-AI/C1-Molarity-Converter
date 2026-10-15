@@ -3,7 +3,7 @@ import { MASS_BASIS, MASS_BASIS_LABEL, MASS_UNITS, MOLAR_UNITS, MW_PROVENANCE, M
 import { ENGINE_VERSION, type Direction } from './lib/convert';
 import { computeConversion, notebookLine } from './lib/compute';
 import { toJson } from './lib/serialise';
-import { SCOPE_STATEMENT, UNDETECTABLE_FAILURES, flagLabel } from './lib/flags';
+import { UNDETECTABLE_FAILURES, flagLabel } from './lib/flags';
 import { CONSTANTS_AND_ASSUMPTIONS, DOES_NOT_ALSO, DOES_NOT_INTRO, FLAG_LEGEND, FLAG_LEGEND_INTRO, HOW_IT_WORKS_FORMULAE, HOW_IT_WORKS_INTRO, HOW_TO_USE, PRECISION_NOTE, TOOLTIPS, WHAT_IT_DOES, WHY_NOT_A_SPREADSHEET, WHY_NOT_A_SPREADSHEET_INTRO, WORKED_EXAMPLES, WORKED_EXAMPLES_INTRO, } from './lib/copy';
 import { confirmField, retainedOnDirectionChange, toRetainedFields, type RetainableField } from './lib/retention';
 import { APP_VERSION, TOOL_NAME } from './lib/site';
@@ -332,7 +332,6 @@ export function App() {
                     {UNDETECTABLE_FAILURES.map((f) => <li key={f}>{f}</li>)}
                   </ol>
                   {DOES_NOT_ALSO.map((p) => <p key={p}>{p}</p>)}
-                  <p><strong>{SCOPE_STATEMENT}</strong></p>
                 </div>
               </section>
             </div>
@@ -436,7 +435,6 @@ export function App() {
                       {result.flags.some((f) => f.kind === 'threshold') && (<p>{result.statements.thresholdEvaluation}</p>)}
                       <p>{result.statements.precision}</p>
                       <p>{result.statements.moleculesNotSites}</p>
-                      <p><strong>{result.statements.scope}</strong></p>
                     </div>
                   </>)}
               </div>
