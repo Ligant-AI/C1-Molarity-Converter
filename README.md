@@ -1,12 +1,14 @@
-# Molarity Converter
+# Molarity Converter for Biologics
 
-Part of [Ligant Bench Tools](https://benchtools.ligant.ai/): free, open-source calculators for the laboratory bench. This repository holds the source of **Molarity Converter** so you can download it and run it on your own computer. The hosted version is at https://benchtools.ligant.ai/molarity-converter/
+Part of [Ligant Bench Tools](https://benchtools.ligant.ai/): free, open-source calculators for the laboratory bench. This repository holds the source of **Molarity Converter for Biologics** so you can download it and run it on your own computer. The hosted version is at https://benchtools.ligant.ai/molarity-converter/
+
+This repository contains the complete source needed to build and run the tool. Code comments and development history are not included.
 
 ## Research use only
 
 Research use only. Not qualified for GxP decision-making.
 
-Molarity Converter is a standalone calculator for research use, not for use in a GxP setting. For GxP work, Ligant offers a separate enterprise product. If your lab needs that, contact us at hello@ligant.ai.
+Molarity Converter for Biologics is a standalone calculator for research use, not for use in a GxP setting. For GxP work, Ligant offers a separate enterprise product. If your lab needs that, contact us at hello@ligant.ai.
 
 ## Run it on your computer
 
@@ -28,10 +30,10 @@ Everything runs in your browser. Nothing you enter into the calculator, and no r
 
 ## Cite
 
-If you use Molarity Converter in your work, please cite it. The citation is in [CITATION.cff](CITATION.cff) (GitHub shows it under "Cite this repository").
+If you use Molarity Converter for Biologics in your work, please cite it. The citation is in [CITATION.cff](CITATION.cff) (GitHub shows it under "Cite this repository").
 
 ## Licence
 
 Apache License 2.0, see [LICENSE](LICENSE). The bundled fonts (Inter, IBM Plex Mono) are under the SIL Open Font License 1.1.
 
-Molarity Converter v0.1.3. © Ligant AI Incorporated.
+Molarity Converter for Biologics v0.1.3. © Ligant AI Incorporated.
