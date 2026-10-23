@@ -1,6 +1,6 @@
 import { MASS_TO_G_PER_L, MOLAR_TO_MOL_PER_L, MW_TO_G_PER_MOL, UNIT_LABEL, type MassUnit, type MolarUnit, type MwUnit, } from './units';
 export type Direction = 'mass-to-molar' | 'molar-to-mass';
-export const ENGINE_VERSION = '0.5.0';
+export const ENGINE_VERSION = '0.6.0';
 export interface ConversionUnits {
     mass: MassUnit;
     molar: MolarUnit;

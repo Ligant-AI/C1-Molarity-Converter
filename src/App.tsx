@@ -10,6 +10,7 @@ import { APP_VERSION, TOOL_NAME } from './lib/site';
 import { LigantMark, SuiteFooter, SuiteHeader } from '@ligant/bench-chrome/react';
 import { FOOTER, HEADER } from './lib/chrome';
 import { InfoTip } from './InfoTip';
+import { Faq } from './Faq';
 import { formatSigFigs } from './lib/format';
 function Emphasised({ text }: {
     text: string;
@@ -441,6 +442,9 @@ export function App() {
             </section>
           </div>
         </main>
+
+        
+        <Faq />
 
         
         {SHOW_RECORD && result && (<section className="panel record" aria-labelledby="record-h">

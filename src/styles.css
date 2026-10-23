@@ -291,6 +291,12 @@ pre.record-json {
   white-space: pre;
 }
 
+.faq-panel { margin-top: 24px; }
+.faq-panel .panel-body { gap: 0; }
+.faq-panel h3 { font-size: 13px; font-weight: 600; margin: 0 0 6px; color: var(--ink); }
+.faq-panel .panel-body > div + div h3 { margin-top: 14px; }
+.faq-panel p { color: var(--text-secondary); font-size: 13px; line-height: 1.6; max-width: 110ch; margin: 0; }
+
 .prose p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 .prose .panel-body p { margin: 0; max-width: 78ch; }
 .prose .panel-body { gap: 10px; }

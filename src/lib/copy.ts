@@ -1,7 +1,3 @@
-export const STANDFIRST: readonly string[] = [
-    'Converts between mass and molar concentration for a protein whose molecular weight you declare.',
-    'The arithmetic is simple. The molecular weight is what goes wrong, and a spreadsheet does not ask for it or record it unless you add cells for it. This tool asks for the weight, where it came from, and what it is the mass of, then puts all three in the result.',
-];
 export const TOOLTIPS = {
     direction: [
         'Pick the direction before you enter anything. Mass to molar takes mg/mL, µg/mL and similar and returns M, mM, µM, nM or pM. Molar to mass does the reverse. The same molecular weight is required either way.',
@@ -44,7 +40,7 @@ export const HOW_TO_USE: readonly Step[] = [
     },
     {
         title: 'Enter the molecular weight and choose its unit.',
-        body: 'Take it from your certificate of analysis, vendor datasheet, sequence calculation or mass spec result. Do not take it from memory or from a similar construct: that is the error this tool exists to catch, and it cannot detect it for you.',
+        body: 'Take it from your certificate of analysis, vendor datasheet, sequence calculation or mass spec result. Do not take it from memory or from a similar construct: a wrong weight still gives a clean, plausible number, and the tool cannot detect it for you.',
     },
     {
         title: 'Say where the weight came from, and what it is the mass of.',
@@ -153,7 +149,7 @@ export const FLAG_LEGEND: readonly FlagRow[] = [
     { code: 'FL-03', means: 'Molar concentration below 1 pM. Below most working solutions.', action: 'Check the units; for a genuinely dilute standard the flag is expected.' },
     { code: 'FL-04', means: 'Source of the weight is "calculated from sequence". A sequence mass excludes glycosylation and other modifications where present; for an aglycosylated construct it is the actual mass.', action: 'The weight must count the same thing as your mass concentration. If the concentration includes the glycans or other modifications (a weighed amount, or a vendor figure for the whole glycoprotein), use a measured mass instead: intact mass spectrometry, or a certificate that states the mass was measured. If the concentration came from A280 with an extinction coefficient calculated from the sequence, it counts the polypeptide only, and the sequence mass is the matching weight.' },
     { code: 'FL-05', means: 'Source of the weight is "not recorded". The result cannot be traced to a source.', action: 'Find the source before recording the result in a method.' },
-    { code: 'FL-06', means: 'The weight is declared a subunit. The molar concentration is of the subunit, not of the assembled molecule.', action: 'If you need the concentration of the assembled molecule, enter the assembled mass and declare it assembled.' },
+    { code: 'FL-06', means: 'The weight is declared a subunit. The molar concentration is not of the assembled molecule. It is of the subunit only where your mass concentration counts that subunit alone, or the molecule is made of identical subunits.', action: 'If you need the concentration of the assembled molecule, enter the assembled mass and declare it assembled.' },
     { code: 'FL-07', means: 'What the weight is the mass of is "not recorded". The record cannot say whether the concentration is of the assembled molecule, a subunit or a conjugate.', action: 'Find out what the weight is the mass of (the assembled molecule, a subunit, or a conjugate including its label or payload) and declare it before recording the result.' },
     { code: 'FL-08', means: 'The weight is declared a conjugate. The molar concentration counts conjugate molecules. Where each conjugate carries one antibody, that is also the antibody\'s molar concentration. The dye or payload concentration is not computed: drug-to-antibody ratio and degree of labelling are not applied.', action: 'Check that your mass concentration is also of the whole conjugate. If it is of the antibody protein, as fluorochrome datasheets usually quote, enter the antibody\'s own weight and declare it assembled instead. For the mass concentration of the protein alone, multiply the molar concentration by the protein\'s molecular weight; for the dye or payload, multiply it by the degree of labelling or drug-to-antibody ratio.' },
     { code: 'FL-09', means: 'A declaration was carried over a change of direction and not re-confirmed. The result uses values you declared in the other direction.', action: 'Confirm the carried values before recording the result.' },

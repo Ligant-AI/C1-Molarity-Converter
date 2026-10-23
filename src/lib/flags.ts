@@ -166,7 +166,7 @@ export function raiseFlags(input: FlagInput): Flag[] {
             code: 'C1-FL-06',
             kind: 'declaration',
             evaluatedOn: 'mass-basis declaration',
-            message: 'Molar concentration computed is of the subunit, not of the assembled molecule.',
+            message: 'Molar concentration computed is not of the assembled molecule; it is of the subunit only where the mass concentration counts that subunit alone, or every subunit is identical.',
         });
     }
     if (input.massBasis === 'not-recorded') {
@@ -224,9 +224,8 @@ export const UNDETECTABLE_FAILURES: readonly string[] = [
     'A molecular weight that is correct for a different construct.',
     'A molecular weight that was correct for a prior lot or formulation.',
     'A subunit mass quoted where the assembled mass was needed, or the reverse; the tool requires the declaration but cannot verify it.',
-    'A unit-magnitude transcription error where the entered weight still falls inside the plausible range. The molecular weight check (FL-01) catches a 1000× error that lands outside 1–1000 kDa; it cannot catch one that lands inside, and it cannot distinguish a genuinely unusual protein from a typo.',
+    'A unit-magnitude transcription error where the entered weight still falls inside the plausible range. The molecular weight check (FL-01) catches a 1000× error that lands outside 1 to 1000 kDa (1 to 2000 kDa if declared a conjugate); it cannot catch one that lands inside, and it cannot distinguish a genuinely unusual protein from a typo.',
     'Any error in the input concentration itself.',
-    'That a result shown as 0.00000 is a real concentration too small to represent in the unit you chose, rather than an empty solution. The tool DOES detect this and records it, so what it cannot do is show you the value: the two cases are indistinguishable on screen by eye. Reporting the result in a smaller unit is usually enough. 1e-320 mg/mL of a 1000 kDa protein is zero in M and representable in pM.',
     'A conjugate mass declared as unconjugated, or the reverse; the tool requires the declaration but cannot verify it, as above.',
     'Whether a stated concentration is per volume of solution or per volume of solvent. The tool\'s arithmetic never uses solute volume, so the two are indistinguishable to it, but they are not the same number: near 250 mg/mL, a partial specific volume around 0.73 mL/g means the solute occupies roughly 18% of the volume, and flag FL-02 names this where it fires.',
 ] as const;

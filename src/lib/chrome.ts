@@ -1,10 +1,10 @@
 import type { FooterOptions, HeaderOptions } from '@ligant/bench-chrome';
-import { STANDFIRST } from './copy';
-import { APP_VERSION, CITATION_DOI, DEPLOYED_URL, RELEASE_YEAR, REPO_URL, TOOL_NAME, TOOL_PATH } from './site';
+import { SEO } from './seo';
+import { APP_VERSION, CITATION_DOI, DEPLOYED_URL, RELEASE_YEAR, REPO_URL, TOOL_PATH } from './site';
 export const HEADER: HeaderOptions = {
     path: TOOL_PATH,
-    title: TOOL_NAME,
-    description: [...STANDFIRST],
+    title: SEO.h1,
+    description: SEO.lead,
 };
 export const FOOTER: FooterOptions = {
     repoUrl: REPO_URL,
